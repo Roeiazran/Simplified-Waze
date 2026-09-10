@@ -1,0 +1,18 @@
+# Project docs not meant for version control
+docs/HowToReadme/
+
+# .NET build output
+bin/
+obj/
+
+# Visual Studio / Rider / VS Code user-specific files
+.vs/
+.idea/
+*.user
+*.suo
+
+# Test results
+TestResults/
+
+# macOS
+.DS_Store
