@@ -18,8 +18,11 @@ public class RoadGraphTests
 
         var e1 = new RoadEdge(new EdgeId(1), a, b, length: 100, speedLimit: 50);
         var e2 = new RoadEdge(new EdgeId(2), a, c, length: 200, speedLimit: 50);
+        var e3 = new RoadEdge(new EdgeId(3), b, c, length: 50, speedLimit: 50);
+
         graph.AddEdge(e1);
         graph.AddEdge(e2);
+        graph.AddEdge(e3);
 
         var outgoing = graph.GetOutgoingEdges(a);
 
