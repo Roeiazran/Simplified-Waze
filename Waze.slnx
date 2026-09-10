@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Waze.Core/Waze.Core.csproj" />
+    <Project Path="src/Waze.Simulation/Waze.Simulation.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Waze.Core.Tests/Waze.Core.Tests.csproj" />
+    <Project Path="tests/Waze.Simulation.Tests/Waze.Simulation.Tests.csproj" />
   </Folder>
 </Solution>
