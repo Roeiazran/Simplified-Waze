@@ -9,6 +9,9 @@ public sealed class Vehicle
     public NodeId Destination { get; }
     public Route? CurrentRoute { get; private set; }
     public VehicleState State { get; private set; }
+    public int RouteIndex { get; private set; }
+    public double PositionOnEdge { get; private set; }
+    public EdgeId CurrentEdge => CurrentRoute!.Edges[RouteIndex];
 
     public Vehicle(VehicleId id, NodeId source, NodeId destination)
     {
@@ -27,5 +30,16 @@ public sealed class Vehicle
     public void MarkArrived()
     {
         State = VehicleState.Arrived;
+    }
+
+    public void Advance(double distance)
+    {
+        PositionOnEdge += distance;
+    }
+
+    public void MoveToNextEdge()
+    {
+        RouteIndex++;
+        PositionOnEdge = 0;
     }
 }
