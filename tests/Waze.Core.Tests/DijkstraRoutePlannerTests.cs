@@ -16,9 +16,9 @@ public class DijkstraRoutePlannerTests
         graph.AddNode(new RoadNode(b));
         graph.AddNode(new RoadNode(c));
 
-        graph.AddEdge(new RoadEdge(new EdgeId(1), a, c, length: 10, speedLimit: 50)); // direct, expensive
-        graph.AddEdge(new RoadEdge(new EdgeId(2), a, b, length: 3, speedLimit: 50));
-        graph.AddEdge(new RoadEdge(new EdgeId(3), b, c, length: 3, speedLimit: 50));  // A->B->C cheaper
+        graph.AddEdge(new RoadEdge(new EdgeId(1), a, c, length: 10, speedLimit: 50, capacity: 10)); // direct, expensive
+        graph.AddEdge(new RoadEdge(new EdgeId(2), a, b, length: 3, speedLimit: 50, capacity: 10));
+        graph.AddEdge(new RoadEdge(new EdgeId(3), b, c, length: 3, speedLimit: 50, capacity: 10));  // A->B->C cheaper
 
         var planner = new DijkstraRoutePlanner();
         var route = planner.FindRoute(a, c, graph);

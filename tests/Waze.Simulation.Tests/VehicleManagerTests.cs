@@ -13,7 +13,7 @@ public class VehicleManagerTests
         var b = new NodeId(2);
         graph.AddNode(new RoadNode(a));
         graph.AddNode(new RoadNode(b));
-        graph.AddEdge(new RoadEdge(new EdgeId(1), a, b, length: 10, speedLimit: 5));
+        graph.AddEdge(new RoadEdge(new EdgeId(1), a, b, length: 10, speedLimit: 5, capacity: 10));
 
         var vehicle = new Vehicle(new VehicleId(1), a, b);
         vehicle.AssignRoute(new Route(a, b, new List<EdgeId> { new(1) }, totalCost: 10));

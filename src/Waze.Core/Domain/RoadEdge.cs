@@ -7,13 +7,15 @@ public sealed class RoadEdge
     public NodeId To { get; }
     public double Length { get; }
     public double SpeedLimit { get; }
+    public int Capacity { get; }
 
-    public RoadEdge(EdgeId id, NodeId from, NodeId to, double length, double speedLimit)
+    public RoadEdge(EdgeId id, NodeId from, NodeId to, double length, double speedLimit, int capacity)
     {
         Id = id;
         From = from;
         To = to;
         Length = length;
         SpeedLimit = speedLimit;
+        Capacity = capacity;
     }
 }

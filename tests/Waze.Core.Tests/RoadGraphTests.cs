@@ -16,9 +16,9 @@ public class RoadGraphTests
         graph.AddNode(new RoadNode(b));
         graph.AddNode(new RoadNode(c));
 
-        var e1 = new RoadEdge(new EdgeId(1), a, b, length: 100, speedLimit: 50);
-        var e2 = new RoadEdge(new EdgeId(2), a, c, length: 200, speedLimit: 50);
-        var e3 = new RoadEdge(new EdgeId(3), b, c, length: 50, speedLimit: 50);
+        var e1 = new RoadEdge(new EdgeId(1), a, b, length: 100, speedLimit: 50, capacity: 10);
+        var e2 = new RoadEdge(new EdgeId(2), a, c, length: 200, speedLimit: 50, capacity: 10);
+        var e3 = new RoadEdge(new EdgeId(3), b, c, length: 50, speedLimit: 50, capacity: 10);
 
         graph.AddEdge(e1);
         graph.AddEdge(e2);
