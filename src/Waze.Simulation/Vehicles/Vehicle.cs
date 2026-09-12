@@ -27,6 +27,12 @@ public sealed class Vehicle
         State = VehicleState.Driving;
     }
 
+    public void Reroute(Route newRoute)
+    {
+        CurrentRoute = newRoute;
+        RouteIndex = 0;
+    }
+
     public void MarkArrived()
     {
         State = VehicleState.Arrived;
