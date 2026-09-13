@@ -967,8 +967,7 @@ docs/
 ├── decisions/
 ├── algorithms/
 ├── research/
-├── benchmarks/
-└── concurrency.md
+└── benchmarks/
 ```
 
 The architecture document describes the **current structure of the system**.
@@ -1280,7 +1279,6 @@ Parallel-Project/
 │
 ├── docs/
 │   ├── architecture.md
-│   ├── concurrency.md
 │   ├── decisions/
 │   ├── algorithms/
 │   ├── research/
@@ -2650,7 +2648,7 @@ Parallel
 
 The decision to keep a component serial should be documented when non-obvious.
 
-Detailed concurrency behavior should also be maintained in `docs/concurrency.md`.
+Detailed concurrency behavior should also be maintained in `docs/decisions/concurrency/`.
 
 ---
 
@@ -3644,11 +3642,11 @@ More detailed or historical information should remain in dedicated documents.
 docs/
 │
 ├── architecture.md
-├── concurrency.md
 │
 ├── decisions/
     ├── architecture/
     ├── design/
+    ├── concurrency/
 
 ├── algorithms/
 ├── research/
@@ -3714,18 +3712,19 @@ Stores reproducible performance experiments and their results.
 
 ---
 
-### Concurrency Documentation
+### Concurrency Decisions
 
-`concurrency.md`
+`docs/decisions/concurrency/`
 
-Contains detailed information about:
+One file per concurrency-affecting change. Each entry records the shared
+and unshared state involved, what had to change and why, and is later
+referenced from the relevant Benchmark Journal entry once measured.
 
-- workers;
-- shared state;
-- synchronization;
-- ownership;
-- race conditions;
-- consistency guarantees.
+Example:
+
+```text
+Why RoutingWorkerPool needs no synchronization.
+```
 
 This prevents the architecture document from becoming a detailed synchronization manual.
 
