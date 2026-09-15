@@ -1,5 +1,6 @@
 using Waze.Core.Domain;
 using Waze.Core.Graph;
+using Waze.Core.Routing;
 using Waze.Simulation.Traffic;
 
 namespace Waze.Simulation.Vehicles;
@@ -50,5 +51,23 @@ public sealed class VehicleManager
         var enteredEdgeId = vehicle.CurrentEdge;
         trafficState.VehicleEntered(enteredEdgeId);
         return enteredEdgeId;
+    }
+
+    public void CreateVehicle(VehicleId id, NodeId source, NodeId destination, IRoutePlanner routePlanner, RoadGraph graph, TrafficState trafficState)
+    {
+        var vehicle = new Vehicle(id, source, destination);
+        var route = routePlanner.FindRoute(source, destination, graph);
+
+        if (route.Edges.Count == 0)
+        {
+            vehicle.MarkArrived();
+        }
+        else
+        {
+            vehicle.AssignRoute(route);
+            trafficState.VehicleEntered(route.Edges[0]);
+        }
+
+        Add(vehicle);
     }
 }
