@@ -72,3 +72,5 @@ Parallel.For(0, requests.Count, new ParallelOptions { MaxDegreeOfParallelism = _
 
 The only difference is execution strategy: the parallel version runs iterations across up to `_workerCount` threads instead of one after
 another.
+
+[Benchmark link](../../benchmarks/routing-worker-pool-throughput.md)

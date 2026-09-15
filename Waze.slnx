@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Waze.SimulationBenchmarks/Waze.SimulationBenchmarks.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Waze.Core/Waze.Core.csproj" />
     <Project Path="src/Waze.Simulation/Waze.Simulation.csproj" />
