@@ -1,6 +1,7 @@
 using Waze.Core.Domain;
 using Waze.Simulation.Vehicles;
 using Waze.Core.Graph;
+using Waze.Simulation.Traffic;
 using Xunit;
 
 public class VehicleManagerTests
@@ -21,10 +22,10 @@ public class VehicleManagerTests
         var manager = new VehicleManager();
         manager.Add(vehicle);
 
-        manager.AdvanceAll(graph); // position 5, still Driving
+        manager.AdvanceAll(graph, new TrafficState()); // position 5, still Driving
         Assert.Equal(VehicleState.Driving, vehicle.State);
 
-        manager.AdvanceAll(graph); // position 10 >= length 10 -> Arrived
+        manager.AdvanceAll(graph, new TrafficState()); // position 10 >= length 10 -> Arrived
         Assert.Equal(VehicleState.Arrived, vehicle.State);
     }
 }
