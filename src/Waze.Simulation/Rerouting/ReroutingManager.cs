@@ -30,7 +30,7 @@ public sealed class ReroutingManager
         if (vehicle.State != VehicleState.Driving || vehicle.CurrentRoute is null)
             return false;
 
-        return vehicle.CurrentRoute.Edges.Skip(vehicle.RouteIndex).Contains(changedEdge);
+        return vehicle.CurrentRoute.Edges.Skip(vehicle.RouteIndex + 1).Contains(changedEdge);
     }
 
     private void TryReroute(Vehicle vehicle, RoadGraph graph)
