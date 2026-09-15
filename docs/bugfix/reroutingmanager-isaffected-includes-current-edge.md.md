@@ -8,7 +8,7 @@ File path: `src/Waze.Simulation/Rerouting/ReroutingManager.cs`
 
 ## Fixed In
 
-Current commit.
+`791ed1c`
 
 ## Summary
 
