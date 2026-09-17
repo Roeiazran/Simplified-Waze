@@ -9,20 +9,27 @@ public sealed class ReroutingManager
 {
     private readonly IRoutePlanner _routePlanner;
     private readonly double _minimumImprovementRatio;
-
     public ReroutingManager(IRoutePlanner routePlanner, double minimumImprovementRatio = 0.1)
     {
         _routePlanner = routePlanner;
         _minimumImprovementRatio = minimumImprovementRatio;
     }
 
-    public void HandleCongestedEdge(EdgeId congestedEdge, IReadOnlyList<Vehicle> vehicles, RoadGraph graph)
+    public (int Attempts, int Reroutes) HandleCongestedEdge(EdgeId congestedEdge, IReadOnlyList<Vehicle> vehicles, RoadGraph graph)
     {
+        var rerouted = 0;
+        var attempted = 0;
+
         foreach (var vehicle in vehicles)
         {
-            if (IsAffected(vehicle, congestedEdge))
-                TryReroute(vehicle, graph);
+            if (!IsAffected(vehicle, congestedEdge))
+                continue;
+            
+            attempted++;
+            if (TryReroute(vehicle, graph))
+                rerouted++;
         }
+        return (attempted, rerouted);
     }
 
     private static bool IsAffected(Vehicle vehicle, EdgeId changedEdge)
@@ -33,7 +40,7 @@ public sealed class ReroutingManager
         return vehicle.CurrentRoute.Edges.Skip(vehicle.RouteIndex + 1).Contains(changedEdge);
     }
 
-    private void TryReroute(Vehicle vehicle, RoadGraph graph)
+    private bool TryReroute(Vehicle vehicle, RoadGraph graph)
     {
         var currentEdgeId = vehicle.CurrentEdge;
         var currentEdge = graph.GetEdge(currentEdgeId);
@@ -52,6 +59,8 @@ public sealed class ReroutingManager
             var totalCost = remainingOnCurrentEdge + candidateTail.TotalCost;
             var splicedRoute = new Route(currentEdge.From, vehicle.Destination, splicedEdges, totalCost);
             vehicle.Reroute(splicedRoute);
+            return true;
         }
+        return false;
     }
 }

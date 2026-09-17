@@ -13,7 +13,9 @@ public sealed class SimulationEngine
     private readonly ReroutingManager _reroutingManager;
 
     public int CurrentTick { get; private set; }
-
+    public int TotalCongestionEvents { get; private set; }
+    public int TotalReroutes { get; private set; }
+    public int TotalRerouteAttempts { get; private set; }
     public SimulationEngine(RoadGraph graph, VehicleManager vehicleManager, TrafficManager trafficManager, ReroutingManager reroutingManager)
     {
         _graph = graph;
@@ -27,8 +29,14 @@ public sealed class SimulationEngine
         var enteredEdges = _vehicleManager.AdvanceAll(_graph, _trafficManager.State);
         var congestedEdges = _trafficManager.DetectCongestedEdges(enteredEdges, _graph);
 
+        TotalCongestionEvents += congestedEdges.Count;
+
         foreach (var edgeId in congestedEdges)
-            _reroutingManager.HandleCongestedEdge(edgeId, _vehicleManager.Vehicles, _graph);
+        {
+            var (attempts, reroutes) = _reroutingManager.HandleCongestedEdge(edgeId, _vehicleManager.Vehicles, _graph);
+            TotalRerouteAttempts += attempts;
+            TotalReroutes += reroutes;
+        }
 
         CurrentTick++;
     }

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Waze.Core\Waze.Core.csproj" />
+    <ProjectReference Include="..\..\src\Waze.Simulation\Waze.Simulation.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
