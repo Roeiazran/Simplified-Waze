@@ -42,7 +42,7 @@ Single run, Release build, no warmup.
 | Reroute attempts | 312,668 |
 | Successful reroutes | 0 |
 
-### Run 2 — with RouteCache/CachingRoutePlanner (2026-09-18, commit `<fill in after committing>`)
+### Run 2 — with RouteCache/CachingRoutePlanner (2026-09-18, commit `4150538`)
 
 Same configuration, only change: `ReroutingManager` now receives
 `CachingRoutePlanner(DijkstraRoutePlanner, RouteCache)` instead of a plain
