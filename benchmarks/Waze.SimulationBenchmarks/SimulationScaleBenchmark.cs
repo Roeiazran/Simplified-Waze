@@ -15,7 +15,8 @@ public static class SimulationScaleBenchmark
         var graph = GraphGenerator.BuildGridGraph(gridSize);
         var vehicleManager = new VehicleManager();
         var trafficManager = new TrafficManager(new TrafficState(), new CongestionDetector());
-        var reroutingManager = new ReroutingManager(new DijkstraRoutePlanner());
+        var cachingPlanner = new CachingRoutePlanner(new DijkstraRoutePlanner(), new RouteCache());
+        var reroutingManager = new ReroutingManager(cachingPlanner);
         var engine = new SimulationEngine(graph, vehicleManager, trafficManager, reroutingManager);
 
         var random = new Random(seed);
@@ -42,5 +43,6 @@ public static class SimulationScaleBenchmark
         Console.WriteLine($"Ran {tickCount} ticks in {sw.ElapsedMilliseconds}ms ({tickCount / sw.Elapsed.TotalSeconds:F0} ticks/sec)");
         Console.WriteLine($"Arrived: {arrivedCount}, still driving: {drivingCount}");
         Console.WriteLine($"Congestion events: {engine.TotalCongestionEvents}, reroute attempts: {engine.TotalRerouteAttempts}, reroutes: {engine.TotalReroutes}");
+        Console.WriteLine($"Route cache: {cachingPlanner.Hits} hits, {cachingPlanner.Misses} misses");
     }
 }
