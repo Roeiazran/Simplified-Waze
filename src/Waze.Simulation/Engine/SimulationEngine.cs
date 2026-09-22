@@ -1,5 +1,6 @@
 using Waze.Core.Graph;
 using Waze.Simulation.Rerouting;
+using Waze.Simulation.Routing;
 using Waze.Simulation.Traffic;
 using Waze.Simulation.Vehicles;
 
@@ -11,7 +12,7 @@ public sealed class SimulationEngine
     private readonly VehicleManager _vehicleManager;
     private readonly TrafficManager _trafficManager;
     private readonly ReroutingManager _reroutingManager;
-
+    private readonly RoutingGraphView _routingGraph;
     public int CurrentTick { get; private set; }
     public int TotalCongestionEvents { get; private set; }
     public int TotalReroutes { get; private set; }
@@ -22,6 +23,7 @@ public sealed class SimulationEngine
         _vehicleManager = vehicleManager;
         _trafficManager = trafficManager;
         _reroutingManager = reroutingManager;
+        _routingGraph = new RoutingGraphView(graph, trafficManager.State);
     }
 
     public void Tick()
@@ -33,7 +35,7 @@ public sealed class SimulationEngine
 
         foreach (var edgeId in congestedEdges)
         {
-            var (attempts, reroutes) = _reroutingManager.HandleCongestedEdge(edgeId, _vehicleManager.Vehicles, _graph);
+            var (attempts, reroutes) = _reroutingManager.HandleCongestedEdge(edgeId, _vehicleManager.Vehicles, _routingGraph);
             TotalRerouteAttempts += attempts;
             TotalReroutes += reroutes;
         }

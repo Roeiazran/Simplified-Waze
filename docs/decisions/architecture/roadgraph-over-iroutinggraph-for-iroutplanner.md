@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded (2026-09-20)
 
 ## Date
 

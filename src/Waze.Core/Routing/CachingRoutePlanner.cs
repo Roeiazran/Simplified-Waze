@@ -1,5 +1,4 @@
 using Waze.Core.Domain;
-using Waze.Core.Graph;
 
 namespace Waze.Core.Routing;
 
@@ -17,7 +16,7 @@ public sealed class CachingRoutePlanner : IRoutePlanner
         _cache = cache;
     }
 
-    public Route FindRoute(NodeId source, NodeId destination, RoadGraph graph)
+    public Route FindRoute(NodeId source, NodeId destination, IRoutingGraph graph)
     {
         if (_cache.TryGet(source, destination, out var cached))
         {

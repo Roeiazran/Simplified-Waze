@@ -1,5 +1,4 @@
 using Waze.Core.Domain;
-using Waze.Core.Graph;
 
 namespace Waze.Core.Routing;
 
@@ -14,7 +13,7 @@ public sealed class RoutingWorkerPool
         _workerCount = workerCount;
     }
 
-    public IReadOnlyList<Route> FindRoutes(IReadOnlyList<(NodeId Source, NodeId Destination)> requests, RoadGraph graph)
+    public IReadOnlyList<Route> FindRoutes(IReadOnlyList<(NodeId Source, NodeId Destination)> requests, IRoutingGraph graph)
     {
         var results = new Route[requests.Count];
 

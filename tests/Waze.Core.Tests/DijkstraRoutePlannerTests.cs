@@ -21,7 +21,7 @@ public class DijkstraRoutePlannerTests
         graph.AddEdge(new RoadEdge(new EdgeId(3), b, c, length: 3, speedLimit: 50, capacity: 10));  // A->B->C cheaper
 
         var planner = new DijkstraRoutePlanner();
-        var route = planner.FindRoute(a, c, graph);
+        var route = planner.FindRoute(a, c, new SimpleRoutingGraph(graph));
 
         Assert.Equal(6, route.TotalCost);
         Assert.Equal(2, route.Edges.Count);

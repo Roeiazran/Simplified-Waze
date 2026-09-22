@@ -2,7 +2,9 @@ using Waze.Core.Domain;
 using Waze.Core.Graph;
 using Waze.Core.Routing;
 using Waze.Simulation.Rerouting;
+using Waze.Simulation.Routing;
 using Waze.Simulation.Vehicles;
+using Waze.Simulation.Traffic;
 using Xunit;
 
 public class ReroutingManagerTests
@@ -32,7 +34,7 @@ public class ReroutingManagerTests
         vehicle.MoveToNextEdge(); // simulate having already finished `ab`; now on `bc`, RouteIndex = 1
 
         var manager = new ReroutingManager(new DijkstraRoutePlanner());
-        manager.HandleCongestedEdge(cd, new List<Vehicle> { vehicle }, graph);
+        manager.HandleCongestedEdge(cd, new List<Vehicle> { vehicle }, new RoutingGraphView(graph, new TrafficState()));
 
         Assert.Equal(b, vehicle.CurrentRoute!.Source); // starts where the current edge starts, not at `a`
     }
@@ -61,7 +63,7 @@ public class ReroutingManagerTests
         vehicle.AssignRoute(new Route(a, d, new List<EdgeId> { ab, bc, cd }, totalCost: 106));
 
         var manager = new ReroutingManager(new DijkstraRoutePlanner());
-        manager.HandleCongestedEdge(bc, new List<Vehicle> { vehicle }, graph);
+        manager.HandleCongestedEdge(bc, new List<Vehicle> { vehicle }, new RoutingGraphView(graph, new TrafficState()));
 
         Assert.Equal(ab, vehicle.CurrentEdge);
         Assert.Equal(new List<EdgeId> { ab, bd }, vehicle.CurrentRoute!.Edges);
@@ -81,7 +83,7 @@ public class ReroutingManagerTests
         vehicle.AssignRoute(new Route(a, b, new List<EdgeId> { edge }, totalCost: 10));
 
         var manager = new ReroutingManager(new DijkstraRoutePlanner());
-        manager.HandleCongestedEdge(new EdgeId(999), new List<Vehicle> { vehicle }, graph);
+        manager.HandleCongestedEdge(new EdgeId(999), new List<Vehicle> { vehicle }, new RoutingGraphView(graph, new TrafficState()));
 
         Assert.Equal(edge, vehicle.CurrentRoute!.Edges[0]);
     }

@@ -1,6 +1,7 @@
 using Waze.Core.Domain;
 using Waze.Core.Graph;
 using Waze.Core.Routing;
+using Waze.Simulation.Routing;
 using Waze.Simulation.Traffic;
 
 namespace Waze.Simulation.Vehicles;
@@ -56,7 +57,8 @@ public sealed class VehicleManager
     public void CreateVehicle(VehicleId id, NodeId source, NodeId destination, IRoutePlanner routePlanner, RoadGraph graph, TrafficState trafficState)
     {
         var vehicle = new Vehicle(id, source, destination);
-        var route = routePlanner.FindRoute(source, destination, graph);
+        var routingGraph = new RoutingGraphView(graph, trafficState);
+        var route = routePlanner.FindRoute(source, destination, routingGraph);
 
         if (route.Edges.Count == 0)
         {

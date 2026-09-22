@@ -1,11 +1,10 @@
 using Waze.Core.Domain;
-using Waze.Core.Graph;
 
 namespace Waze.Core.Routing;
 
 public sealed class DijkstraRoutePlanner : IRoutePlanner
 {
-    public Route FindRoute(NodeId source, NodeId destination, RoadGraph graph)
+    public Route FindRoute(NodeId source, NodeId destination, IRoutingGraph graph)
     {
         var distances = new Dictionary<NodeId, double> { [source] = 0 };
         var predecessorEdge = new Dictionary<NodeId, EdgeId>();
@@ -24,7 +23,7 @@ public sealed class DijkstraRoutePlanner : IRoutePlanner
 
             foreach (var edge in graph.GetOutgoingEdges(current))
             {
-                var newDistance = distances[current] + edge.Length;
+                var newDistance = distances[current] + graph.GetCost(edge.Id);
                 if (!distances.TryGetValue(edge.To, out var existing) || newDistance < existing)
                 {
                     distances[edge.To] = newDistance;

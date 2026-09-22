@@ -20,7 +20,7 @@ public class RoutingWorkerPoolTests
         var pool = new RoutingWorkerPool(new DijkstraRoutePlanner(), workerCount: 4);
         var requests = new List<(NodeId, NodeId)> { (a, b), (a, c), (b, c) };
 
-        var results = pool.FindRoutes(requests, graph);
+        var results = pool.FindRoutes(requests, new SimpleRoutingGraph(graph));
 
         Assert.Equal(3, results[0].TotalCost); // a->b direct
         Assert.Equal(7, results[1].TotalCost);  // a->b->c cheaper than direct a->c

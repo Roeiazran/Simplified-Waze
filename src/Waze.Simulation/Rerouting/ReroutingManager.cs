@@ -1,5 +1,4 @@
 using Waze.Core.Domain;
-using Waze.Core.Graph;
 using Waze.Core.Routing;
 using Waze.Simulation.Vehicles;
 
@@ -15,7 +14,7 @@ public sealed class ReroutingManager
         _minimumImprovementRatio = minimumImprovementRatio;
     }
 
-    public (int Attempts, int Reroutes) HandleCongestedEdge(EdgeId congestedEdge, IReadOnlyList<Vehicle> vehicles, RoadGraph graph)
+    public (int Attempts, int Reroutes) HandleCongestedEdge(EdgeId congestedEdge, IReadOnlyList<Vehicle> vehicles, IRoutingGraph graph)
     {
         var rerouted = 0;
         var attempted = 0;
@@ -40,14 +39,15 @@ public sealed class ReroutingManager
         return vehicle.CurrentRoute.Edges.Skip(vehicle.RouteIndex + 1).Contains(changedEdge);
     }
 
-    private bool TryReroute(Vehicle vehicle, RoadGraph graph)
+    private bool TryReroute(Vehicle vehicle, IRoutingGraph graph)
     {
         var currentEdgeId = vehicle.CurrentEdge;
         var currentEdge = graph.GetEdge(currentEdgeId);
-        var remainingOnCurrentEdge = currentEdge.Length - vehicle.PositionOnEdge;
+        var remainingPhysicalDistance = currentEdge.Length - vehicle.PositionOnEdge;
+        var remainingCostOnCurrentEdge = remainingPhysicalDistance / currentEdge.Length * graph.GetCost(currentEdgeId);
 
         var oldContinuationCost = vehicle.CurrentRoute!.Edges.Skip(vehicle.RouteIndex + 1)
-            .Sum(edgeId => graph.GetEdge(edgeId).Length);
+            .Sum(graph.GetCost);
 
         var candidateTail = _routePlanner.FindRoute(currentEdge.To, vehicle.Destination, graph);
 
@@ -56,7 +56,7 @@ public sealed class ReroutingManager
             var splicedEdges = new List<EdgeId> { currentEdgeId };
             splicedEdges.AddRange(candidateTail.Edges);
 
-            var totalCost = remainingOnCurrentEdge + candidateTail.TotalCost;
+            var totalCost = remainingCostOnCurrentEdge + candidateTail.TotalCost;
             var splicedRoute = new Route(currentEdge.From, vehicle.Destination, splicedEdges, totalCost);
             vehicle.Reroute(splicedRoute);
             return true;

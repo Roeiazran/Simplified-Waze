@@ -12,7 +12,7 @@ public class CachingRoutePlannerTests
 
         public CountingRoutePlanner(IRoutePlanner inner) => _inner = inner;
 
-        public Route FindRoute(NodeId source, NodeId destination, RoadGraph graph)
+        public Route FindRoute(NodeId source, NodeId destination, IRoutingGraph graph)
         {
             CallCount++;
             return _inner.FindRoute(source, destination, graph);
@@ -23,6 +23,7 @@ public class CachingRoutePlannerTests
     public void FindRoute_SecondIdenticalRequest_DoesNotRecomputeUnderlyingPlanner()
     {
         var graph = new RoadGraph();
+        var routingGraph = new SimpleRoutingGraph(graph);
         var a = new NodeId(1); var b = new NodeId(2);
         graph.AddNode(new RoadNode(a));
         graph.AddNode(new RoadNode(b));
@@ -31,8 +32,8 @@ public class CachingRoutePlannerTests
         var counting = new CountingRoutePlanner(new DijkstraRoutePlanner());
         var caching = new CachingRoutePlanner(counting, new RouteCache());
 
-        var first = caching.FindRoute(a, b, graph);
-        var second = caching.FindRoute(a, b, graph);
+        var first = caching.FindRoute(a, b, routingGraph);
+        var second = caching.FindRoute(a, b, routingGraph);
 
         Assert.Equal(1, counting.CallCount);
         Assert.Equal(first.TotalCost, second.TotalCost);
