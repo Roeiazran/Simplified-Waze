@@ -15,14 +15,17 @@ public static class SimulationScaleBenchmark
         var graph = GraphGenerator.BuildGridGraph(gridSize);
         var vehicleManager = new VehicleManager();
         var trafficManager = new TrafficManager(new TrafficState(), new CongestionDetector());
-        var cachingPlanner = new CachingRoutePlanner(new DijkstraRoutePlanner(), new RouteCache());
+        var routeCache = new RouteCache();
+        var cachingPlanner = new CachingRoutePlanner(new DijkstraRoutePlanner(), routeCache);
         var reroutingManager = new ReroutingManager(cachingPlanner);
         var engine = new SimulationEngine(graph, vehicleManager, trafficManager, reroutingManager);
 
         var random = new Random(seed);
         var maxNode = gridSize * gridSize - 1;
         var planner = new DijkstraRoutePlanner();
+        const int cacheTtlTicks = 5;
 
+    
         for (var i = 0; i < vehicleCount; i++)
         {
             var source = new NodeId(random.Next(0, maxNode + 1));
@@ -33,8 +36,10 @@ public static class SimulationScaleBenchmark
         Console.WriteLine($"Created {vehicleCount} vehicles on a {gridSize}x{gridSize} grid ({maxNode + 1} nodes)");
 
         var sw = Stopwatch.StartNew();
-        for (var tick = 0; tick < tickCount; tick++)
+        for (var tick = 0; tick < tickCount; tick++) {
+            if (tick % cacheTtlTicks == 0) routeCache.Clear();
             engine.Tick();
+        }
         sw.Stop();
 
         var arrivedCount = vehicleManager.Vehicles.Count(v => v.State == VehicleState.Arrived);

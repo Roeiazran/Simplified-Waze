@@ -13,4 +13,6 @@ public sealed class RouteCache
     {
         _cache[(source, destination)] = route;
     }
+
+    public void Clear () => _cache.Clear();
 }
