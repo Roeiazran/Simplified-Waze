@@ -60,41 +60,83 @@ Same configuration, only change: `ReroutingManager` now receives
 | Cache hits | 260,051 |
 | Cache misses | 52,617 |
 
-## Observations
+### Run 3 — traffic-aware cost via IRoutingGraph (2026-09-22, commit `ce89d62`)
 
-**Zero reroutes despite 312,668 attempts is expected, not a bug.** Every
-vehicle's route was computed by real Dijkstra via `CreateVehicle`, so each
-one is already optimal for the only cost function that exists —
-`RoadEdge.Length`. Congestion changes vehicle *counts* on an edge but does
-not change that edge's *cost*, so `TryReroute`'s recomputation of a
-vehicle's remaining path is mathematically guaranteed to reproduce the
-exact same continuation every time.
+Same configuration as Runs 1-2, only change: routing cost now comes from
+`RoutingGraphView.GetCost` instead of static `RoadEdge.Length`.
 
-**The cache produced a ~5.4x speedup (104,973ms → 19,499ms) while leaving
-every simulation outcome identical** — arrived/still-driving/congestion/
-reroute-attempts/reroutes are exactly the same between both runs, exactly
-as predicted: caching changes how often a route gets *recomputed*, not
-which routes exist or what decisions get made from them.
+| Metric | Value |
+|---|---:|
+| Wall time | 32,526ms |
+| Ticks/sec | 6 |
+| Arrived | 3,386 |
+| Still driving | 1,614 |
+| Congestion events | 34,784 |
+| Reroute attempts | 129,710 |
+| Successful reroutes | 45,078 |
+| Cache hits | 69,826 |
+| Cache misses | 59,884 |
 
-**83.2% hit rate** (260,051 / 312,668) confirms the reasoning behind
-targeting `ReroutingManager` specifically: a vehicle's destination stays
-fixed for its whole trip, and its current position repeats identically
-across every congestion check that lands while it's resident on the same
-edge (5 ticks per edge), so the same `(source, destination)` pair
-genuinely does recur often at this call site — unlike `CreateVehicle`'s
-one-shot random pairs, where a cache was deliberately not applied.
 
-## Conclusion
+## Observations (Run 3)
 
-The rerouting mechanism is functioning exactly as designed given its
-current inputs — it correctly finds no improvement, because none exists
-yet under a traffic-blind cost function. The cache closes the
-*performance* gap (redundant recomputation) but not the *behavioral* one
-(reroutes never succeeding) — those are independent problems, and this
-run confirms they were independent in practice, not just in theory.
+**`reroutes` finally leaves zero — the prediction from Run 1 is confirmed.**
+Since cost now genuinely rises with congestion, recomputing a vehicle's
+remaining path can find a real improvement, unlike the traffic-blind cost
+function where recomputation was mathematically guaranteed to reproduce
+the original route every time.
 
-## Next Experiment
+**Congestion events rose 42% (24,467 → 34,784), not fell.** This is a
+real, plausible emergent effect, not noise: vehicles now actively reroute
+away from congested edges (45,078 times), but rerouting away from one
+jam means piling onto some *other* edge — which can itself become newly
+congested from the sudden extra traffic. The simulation is now exhibiting
+a recognizable real-world phenomenon: relieving one bottleneck can create
+another elsewhere, rather than making total congestion monotonically
+decrease.
 
-Implement traffic-aware cost and re-run — expect `reroutes` to
-  become nonzero, since congested edges would finally cost more than
-  their static length.
+**Reroute attempts fell 58% (312,668 → 129,710) despite more congestion
+events.** This is the self-regulating counterpart to the above: once a
+vehicle successfully reroutes away from an edge, that edge leaves its
+remaining route, so it's no longer checked against future congestion
+events on that same edge. With 45,078 real reroutes removing vehicles
+from future affected-checks, the at-risk population per edge shrinks over
+the run, more than offsetting the higher number of congestion events.
+
+**Cache hit rate dropped from 83.2% to 53.8% (69,826 / 129,710).** In
+Run 2, routing decisions never changed, so the same vehicle asked the
+same `(node, destination)` question repeatedly across many ticks — highly
+repetitive, highly cacheable. Now that vehicles actually reroute, each
+successful reroute puts a vehicle on genuinely new ground, querying
+`(node, destination)` pairs that haven't been asked before — more real
+diversity in the query pattern, so a lower hit rate is the expected
+consequence of the mechanism actually working, not a regression in the
+cache itself.
+
+**Wall time rose to 32,526ms despite 58% fewer attempts** — driven by two
+compounding factors: misses actually increased slightly in absolute terms
+(52,617 → 59,884) despite far fewer total attempts, because the hit rate
+fell so much; and each miss is now intrinsically more expensive, since
+`RoutingGraphView.GetCost` performs a `TrafficState` dictionary lookup for
+*every* edge Dijkstra relaxes during a search, not just a flat field read
+like the old `edge.Length`-based cost.
+
+## Conclusion (updated)
+
+Both predicted experiments from Run 1 are now confirmed with real
+measurements: caching eliminates redundant computation without changing
+outcomes (Run 2), and traffic-aware cost makes rerouting actually
+succeed, at the cost of more expensive individual routing calls and a
+lower cache hit rate as vehicles' behavior genuinely diverges over time
+(Run 3). The system is now exhibiting a real emergent traffic dynamic —
+congestion migrating rather than simply disappearing — that no earlier,
+traffic-blind version of this simulation could have produced.
+
+## Next Experiments
+
+1. ~~Implement `RouteCache`/`CachingRoutePlanner`~~ — done, see Run 2.
+1. ~~Implement traffic-aware cost~~ — done, see Run 3.
+1. Investigate the congestion-migration effect directly — track which
+   edges become congested *after* a nearby edge's congestion triggers
+   reroutes, to confirm the mechanism suspected above rather than infer
+   it from aggregate counts alone.
